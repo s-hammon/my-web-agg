@@ -14,11 +14,14 @@ func (a *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, us
 		Name string `json:"name"`
 		URL  string `json:"url"`
 	}
+	type response struct {
+		Feed       Feed       `json:"feed"`
+		FeedFollow FeedFollow `json:"feed_follow"`
+	}
 
 	decoder := json.NewDecoder(r.Body)
 	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
+	if err := decoder.Decode(&params); err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -36,5 +39,20 @@ func (a *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, us
 		return
 	}
 
-	respondJSON(w, http.StatusOK, dbToFeed(feed))
+	feedFollow, err := a.DB.CreateFeedFollow(r.Context(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		FeedID:    feed.ID,
+		UserID:    feed.UserID,
+	})
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondJSON(w, http.StatusOK, response{
+		Feed:       dbToFeed(feed),
+		FeedFollow: dbToFeedFollow(feedFollow),
+	})
 }
