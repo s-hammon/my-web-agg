@@ -1,5 +1,8 @@
-GOOSE_DIR="sql/schema"
-CONN_STR="postgres://postgres:postgres@localhost:5432/blogator"
+include .env
+
+show-port:
+	echo ${PORT}
+
 build:
 	@go build -o out 
 
