@@ -9,9 +9,9 @@ func (a *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respFeeds := []Feed{}
-	for _, feed := range feeds {
-		respFeeds = append(respFeeds, dbToFeed(feed))
+	respFeeds := make([]Feed, len(feeds))
+	for i, feed := range feeds {
+		respFeeds[i] = dbToFeed(feed)
 	}
 
 	respondJSON(w, http.StatusOK, respFeeds)

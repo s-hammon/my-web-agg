@@ -4,21 +4,21 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
+	"github.com/s-hammon/my-web-agg/internal/database"
 )
 
-func (a *apiConfig) handlerDeleteFeedFollow(w http.ResponseWriter, r *http.Request) {
+func (a *apiConfig) handlerDeleteFeedFollow(w http.ResponseWriter, r *http.Request, user database.User) {
 	feedFollowID := r.PathValue("feedFollowID")
-	if feedFollowID == "" {
-		respondError(w, http.StatusBadRequest, "must provide feedFollowID")
-		return
-	}
 	id, err := uuid.Parse(feedFollowID)
 	if err != nil {
 		respondError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	if err := a.DB.DeleteFeedFollow(r.Context(), id); err != nil {
+	if err := a.DB.DeleteFeedFollow(r.Context(), database.DeleteFeedFollowParams{
+		UserID: user.ID,
+		ID:     id,
+	}); err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return
 	}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,11 +37,6 @@ type Feed struct {
 }
 
 func dbToFeed(feed database.Feed) Feed {
-	lastFetchedAt := &time.Time{}
-	if feed.LastFetchedAt.Valid {
-		*lastFetchedAt = feed.LastFetchedAt.Time
-	}
-
 	return Feed{
 		ID:            feed.ID,
 		CreatedAt:     feed.CreatedAt,
@@ -48,7 +44,7 @@ func dbToFeed(feed database.Feed) Feed {
 		Name:          feed.Name,
 		Url:           feed.Url,
 		UserID:        feed.UserID,
-		LastFetchedAt: lastFetchedAt,
+		LastFetchedAt: nullTimeToTimePtr(feed.LastFetchedAt),
 	}
 }
 
@@ -68,4 +64,12 @@ func dbToFeedFollow(feedFollow database.FeedFollow) FeedFollow {
 		FeedID:    feedFollow.FeedID,
 		UserID:    feedFollow.UserID,
 	}
+}
+
+func nullTimeToTimePtr(t sql.NullTime) *time.Time {
+	if t.Valid {
+		return &t.Time
+	}
+
+	return nil
 }

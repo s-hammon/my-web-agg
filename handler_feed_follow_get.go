@@ -13,7 +13,7 @@ func (a *apiConfig) handlerGetFeedFollowsByUserID(w http.ResponseWriter, r *http
 		return
 	}
 
-	respFeedFollows := []FeedFollow{}
+	respFeedFollows := make([]FeedFollow, len(feedFollows))
 	for _, ff := range feedFollows {
 		respFeedFollows = append(respFeedFollows, dbToFeedFollow(ff))
 	}
