@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -33,6 +34,10 @@ func (a *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, us
 		UserID:    user.ID,
 		Name:      params.Name,
 		Url:       params.URL,
+		LastFetchedAt: sql.NullTime{
+			Time:  time.Now().UTC(),
+			Valid: true,
+		},
 	})
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
